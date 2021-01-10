@@ -13,7 +13,14 @@
           <td>{{product.name}}</td>
           <td>{{product.description}}</td>
           <td>{{product.price}}</td>
-          <td></td>
+          <td>
+            <input 
+              type="button"
+              class="btn btn-primary"
+              value="Buy"
+              @click="addProductToOrder(product.id)"
+            />
+          </td>
         </tr>
       </tbody>
     </table>
@@ -21,7 +28,8 @@
 </template>
 
 <script>
-import Consts from '../consts.js';
+import Consts from '../consts';
+import order from '../order';
 import axios from 'axios';
 import _ from 'underscore';
 
@@ -56,6 +64,13 @@ export default {
           );
         }
       );
+    },
+    addProductToOrder: function(productId) {
+      order.products.push({
+        id: productId,
+        amount: 1
+      });
+      console.log('order: ', order);
     }
   },
   mounted: function() {

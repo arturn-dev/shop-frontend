@@ -11,7 +11,7 @@
     </div>
     <div class="form-group">
       <label for="selectCategory">Category</label>
-      <select v-model="filters.categoryId">
+      <select class="custom-select" v-model="filters.categoryId">
         <option :value="0">All</option>
         <option v-for="category in categories" :key="category.id" :value="category.id">
           {{category.name}}
