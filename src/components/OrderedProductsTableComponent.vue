@@ -12,7 +12,7 @@
         <tr v-for="product in orderedProducts" :key="product.name">
           <td>{{product.name}}</td>
           <td>{{product.amount}}</td>
-          <td>{{product.price}}</td>
+          <td>{{product.amount * product.price}}</td>
           <td>
             <input 
               type="button"
@@ -25,6 +25,7 @@
       </tbody>
     </table>
   </div>
+  <h4>Total cost: {{totalCost}}</h4>
 </template>
 
 <script>
@@ -62,10 +63,20 @@ export default {
         })
         .catch(err => console.log(err));
     });
+  },
+  computed: {
+    totalCost: function() {
+      return _.reduce(this.orderedProducts, function(memo, product) {
+        return memo + product.price * product.amount;
+      }, 0);
+    }
   }
 }
 </script>
 
 <style>
-
+  h4 {
+    margin: 20px;
+    text-align: right;
+  }
 </style>
