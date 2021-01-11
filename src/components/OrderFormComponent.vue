@@ -56,11 +56,19 @@
                 @click="verifyOrder"/>
         </div>
     </form>
+    <div
+        class="alert alert-danger"
+        role="alert"
+        v-if="serverErrMsg != ''">
+      {{serverErrMsg}}
+    </div>
   </div>
 </template>
 
 <script>
+import Consts from '../consts';
 import order from '../order';
+import axios from 'axios';
 
 export default {
   name: 'OrderFormComp',
@@ -69,11 +77,14 @@ export default {
       username: '',
       email: '',
       telNumber: '',
-      validationErrMsgs: []
+      validationErrMsgs: [],
+      serverErrMsg: ''
     }
   },
   methods: {
     verifyOrder: function() {
+      this.validationErrMsgs = [];
+
       if (this.username == undefined || this.username == '')
         this.validationErrMsgs.push("- Username mustn't be empty");
       else if (this.username.match("^[a-zA-Z0-9_]{3,50}$") == undefined)
@@ -89,16 +100,42 @@ export default {
       else if (this.telNumber.match("^[0-9]{9}$") == undefined)
         this.validationErrMsgs.push("- Telephone number should contain only 9 digits");
 
-      if (order.products.length == 0) {
+      if (order.order.products.length == 0) {
         this.validationErrMsgs.push("- You need to order at least one product to make an order");
       }
 
-      if (order.products.some((product) => product.amount <= 0)) {
+      if (order.order.products.some((product) => product.amount <= 0)) {
         this.validationErrMsgs.push("- Amount of every product must be greater than 0");
       }
 
       if (this.validationErrMsgs.length != 0)
         return;
+
+
+      order.order.username = this.username;
+      order.order.email = this.email;
+      order.order.telNumber = this.telNumber;
+      this.sendOrder();
+    },
+    sendOrder: function() {
+      var self = this;
+      axios
+        .post(Consts.backendUrl + '/orders', {
+          'order': order.order
+        })
+        .then(res => {
+          if (res.data.error) {
+            self.serverErrMsg = res.data.data.message;
+          } else {
+            this.validationErrMsgs = [];
+            this.serverErrMsg = '';
+            order.order = JSON.parse(JSON.stringify(order.emptyOrder));
+            this.$emit('order-successful-event');
+
+            console.log('Order send res: ', res);
+          }
+        })
+        .catch(err => console.log(err));
     }
   }
 }

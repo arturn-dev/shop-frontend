@@ -11,7 +11,14 @@
       <tbody>
         <tr v-for="product in orderedProducts" :key="product.name">
           <td>{{product.name}}</td>
-          <td>{{product.amount}}</td>
+          <td>
+            <input
+              type="number"
+              class="form-control"
+              v-model="product.amount"
+              required
+            />
+          </td>
           <td>{{product.amount * product.price}}</td>
           <td>
             <input 
@@ -36,6 +43,9 @@ import _ from 'underscore';
 
 export default {
   name: 'OrderedProductsTableComp',
+  props: {
+    orderSuccessful: {}
+  },
   data: function() {
     return {
       orderedProducts: []
@@ -46,19 +56,28 @@ export default {
       this.orderedProducts = _.without(
         this.orderedProducts, _.findWhere(
           this.orderedProducts, {id: productId}));
-      order.products = _.without(
-        order.products, _.findWhere(
-          order.products, {id: productId}));
+      order.order.products = _.without(
+        order.order.products, _.findWhere(
+          order.order.products, {id: productId}));
+    }
+  },
+  watch: {
+    orderSuccessful: {
+      handler: function(newVal, oldVal) {
+        console.log('Clearing list...', newVal, oldVal);
+        if (newVal == true)
+          this.orderedProducts = [];
+      }
     }
   },
   mounted: function() {
     var self = this;
-    order.products.forEach(product => {
+    order.order.products.forEach(product => {
       axios
         .get(Consts.backendUrl + '/products/' + product.id)
         .then(res => {
           let orderedProduct = res.data.data.product;
-          orderedProduct.amount = product.amount;
+          orderedProduct.amount = 1;
           self.orderedProducts.push(orderedProduct);
         })
         .catch(err => console.log(err));

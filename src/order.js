@@ -1,8 +1,13 @@
-let order = {
+const emptyOrder = {
   username: '',
   email: '',
   telNumber: '',
   products: [],
-};
+}
 
-export default order;
+let order = JSON.parse(JSON.stringify(emptyOrder));
+
+export default {
+  order,
+  emptyOrder
+};

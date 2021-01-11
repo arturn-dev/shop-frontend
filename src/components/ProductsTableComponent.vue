@@ -66,11 +66,10 @@ export default {
       );
     },
     addProductToOrder: function(productId) {
-      order.products.push({
-        id: productId,
-        amount: 1
+      order.order.products.push({
+        id: productId
       });
-      console.log('order: ', order);
+      console.log('order: ', order.order);
     }
   },
   mounted: function() {
